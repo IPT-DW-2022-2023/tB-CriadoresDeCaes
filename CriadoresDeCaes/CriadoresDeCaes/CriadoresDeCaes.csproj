@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-CriadoresDeCaes-a8573b07-eec4-4beb-9c2f-29de16afde7d</UserSecretsId>
   </PropertyGroup>
