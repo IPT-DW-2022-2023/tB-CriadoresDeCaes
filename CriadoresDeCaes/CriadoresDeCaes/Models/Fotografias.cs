@@ -1,4 +1,6 @@
-﻿namespace CriadoresDeCaes.Models {
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CriadoresDeCaes.Models {
 
    /// <summary>
    /// Fotografias associadas aos cães
@@ -21,6 +23,11 @@
       /// local onde a fotografia foi tirada
       /// </summary>
       public string Local { get; set; }
+
+      //**********************************************
+      [ForeignKey(nameof(Animal))]  // <=>  [ForeignKey("Animal")]
+      public int AnimalFK { get; set; }
+      public Animais Animal { get; set; }
 
    }
 }

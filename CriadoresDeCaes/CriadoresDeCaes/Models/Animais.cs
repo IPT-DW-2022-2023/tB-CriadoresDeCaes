@@ -5,6 +5,10 @@
    /// </summary>
    public class Animais {
 
+      public Animais() {
+         ListaFotografias=new HashSet<Fotografias>();
+      }
+
       public int Id { get; set; }
 
       /// <summary>
@@ -33,6 +37,10 @@
       /// número de registo no LOP
       /// </summary>
       public string NumLOP { get; set; }
+
+      // *************************************
+
+      public ICollection<Fotografias> ListaFotografias { get; set; }
 
    }
 }
