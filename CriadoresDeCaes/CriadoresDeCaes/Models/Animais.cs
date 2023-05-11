@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CriadoresDeCaes.Models {
 
@@ -51,6 +52,7 @@ namespace CriadoresDeCaes.Models {
       /// FK para a Raça do cão/cadela
       /// </summary>
       [ForeignKey(nameof(Raca))]
+      [Display(Name ="Raça")]
       public int RacaFK { get; set; }
       public Racas Raca { get; set; }
 
@@ -58,6 +60,7 @@ namespace CriadoresDeCaes.Models {
       /// FK para o Criador do cão/cadela
       /// </summary>
       [ForeignKey(nameof(Criador))]
+      [Display(Name ="Criador")]
       public int CriadorFK { get; set; }
       public Criadores Criador { get; set; }
 
