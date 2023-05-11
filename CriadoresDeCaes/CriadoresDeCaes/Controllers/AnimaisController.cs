@@ -78,21 +78,40 @@ namespace CriadoresDeCaes.Controllers {
       // POST: Animais/Create
       // To protect from overposting attacks, enable the specific properties you want to bind to.
       // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    /// <summary>
-    /// reage aos dados fornecidos pelo Browser
-    /// </summary>
-    /// <param name="animal">dados do novo animal</param>
-    /// <returns></returns>
+      /// <summary>
+      /// reage aos dados fornecidos pelo Browser
+      /// </summary>
+      /// <param name="animal">dados do novo animal</param>
+      /// <returns></returns>
       [HttpPost]
       [ValidateAntiForgeryToken]
       public async Task<IActionResult> Create([Bind("Id,Nome,DataNascimento,DataCompra,Sexo,NumLOP,RacaFK,CriadorFK")] Animais animal) {
+
+         // se os dados recebidos respeitarem o modelo,
+         // os dados podem ser adicionados
          if (ModelState.IsValid) {
-            _bd.Add(animal);
-            await _bd.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            try {
+               // adicionar os dados à BD
+               _bd.Add(animal);
+               // COMMIT da ação anterior
+               await _bd.SaveChangesAsync();
+               // devolver o controlo da app para a página de início
+               return RedirectToAction(nameof(Index));
+            }
+            catch (Exception) {
+               ModelState.AddModelError("",
+                  "Ocorreu um erro com a adição dos dados do(a) "+animal.Nome);
+              // throw;
+            }
+
          }
-         ViewData["CriadorFK"]=new SelectList(_bd.Criadores, "Id", "Email", animal.CriadorFK);
-         ViewData["RacaFK"]=new SelectList(_bd.Racas, "Id", "Id", animal.RacaFK);
+
+         // preparar estes dados, para quando os dados a introduzir na BD não estão bons
+         ViewData["CriadorFK"]=new SelectList(_bd.Criadores, "Id", "Nome", animal.CriadorFK);
+         ViewData["RacaFK"]=new SelectList(_bd.Racas, "Id", "Nome", animal.RacaFK);
+
+         // devolver à View os dados para correção
          return View(animal);
       }
 
