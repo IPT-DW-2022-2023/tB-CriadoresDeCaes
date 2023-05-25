@@ -10,10 +10,24 @@ using CriadoresDeCaes.Models;
 
 namespace CriadoresDeCaes.Controllers {
    public class AnimaisController : Controller {
+
+      /// <summary>
+      /// este recurso identifica a Base de Dados do projeto
+      /// </summary>
       private readonly ApplicationDbContext _bd;
 
-      public AnimaisController(ApplicationDbContext context) {
+      /// <summary>
+      /// este recurso vai proporcionar acesso aos dados dos 
+      /// recursos do servidor
+      /// </summary>
+      private readonly IWebHostEnvironment _webHostEnvironment;
+
+      public AnimaisController(
+         ApplicationDbContext context,
+         IWebHostEnvironment webHostEnvironment
+         ) {
          _bd = context;
+         _webHostEnvironment = webHostEnvironment;
       }
 
       // GET: Animais
@@ -86,6 +100,9 @@ namespace CriadoresDeCaes.Controllers {
       [HttpPost]
       [ValidateAntiForgeryToken]
       public async Task<IActionResult> Create([Bind("Id,Nome,DataNascimento,DataCompra,Sexo,NumLOP,RacaFK,CriadorFK")] Animais animal, IFormFile imagemAnimal) {
+         // vars. auxiliares
+         string nomeFoto = "";
+         bool existeFoto = false;
 
          // avaliar se temos condições para tentar adicionar o animal
          // testar se a Raça do animal != 0 e Criador =/= 0
@@ -115,8 +132,9 @@ namespace CriadoresDeCaes.Controllers {
                }
                else {
                   // há ficheiro. Mas, será que é uma imagem?
-                  if (imagemAnimal.ContentType != "image/jpeg" ||
+                  if (imagemAnimal.ContentType != "image/jpeg" &&
                       imagemAnimal.ContentType != "image/png") {
+                     //  <=>  ! (imagemAnimal.ContentType == "image/jpeg" || imagemAnimal.ContentType == "image/png")
                      // o ficheiro carregado não é uma imagem
                      // o que fazer?
                      // Vamos fazer o mesmo que quando o utilizador não
@@ -132,18 +150,27 @@ namespace CriadoresDeCaes.Controllers {
                      // há imagem!!!
                      // determinar o nome da imagem
                      Guid g = Guid.NewGuid();
-                     string nomeFoto=g.ToString();
+                     nomeFoto = g.ToString();
                      // obter a extensão do ficheiro
-                     string extensaoNomeFoto=Path.GetExtension(imagemAnimal.FileName).ToLower();
+                     string extensaoNomeFoto = Path.GetExtension(imagemAnimal.FileName).ToLower();
                      nomeFoto += extensaoNomeFoto;
 
+                     // guardar os dados do ficheiro na BD
+                     // para isso, vou associá-los ao 'animal'
+                     animal.ListaFotografias
+                           .Add(new Fotografias {
+                              Data = DateTime.Now,
+                              Local = "",
+                              NomeFicheiro = nomeFoto
+                           });
 
-
-
+                     // informar a aplicação que há um ficheiro
+                     // (imagem) para guardar no disco rígido
+                     existeFoto = true;
                   }
-               }
-            }
-         }
+               } // if (imagemAnimal == null)
+            } // if(animal.CriadoFK == 0)
+         } // if (animal.RacaFK == 0)
 
 
          // se os dados recebidos respeitarem o modelo,
@@ -155,6 +182,28 @@ namespace CriadoresDeCaes.Controllers {
                _bd.Add(animal);
                // COMMIT da ação anterior
                await _bd.SaveChangesAsync();
+
+               // se cheguei aqui, já foram guardados os dados
+               // do animal na BD. Já posso guardar a imagem
+               // no disco rígido do servidor
+               if (existeFoto) {
+                  // determinar onde guardar a imagem
+                  string nomeLocalizacaoImagem = _webHostEnvironment.WebRootPath;
+                  nomeLocalizacaoImagem = Path.Combine(nomeLocalizacaoImagem, "imagens");
+
+                  // e, a pasta onde se pretende guardar a imagem existe?
+                  if (!Directory.Exists(nomeLocalizacaoImagem)) {
+                     Directory.CreateDirectory(nomeLocalizacaoImagem);
+                  }
+
+                  // informar o servidor do nome do ficheiro
+                  string nomeDoFicheiro =
+                     Path.Combine(nomeLocalizacaoImagem, nomeFoto);
+
+                  // guardar o ficheiro
+                  using var stream = new FileStream(nomeDoFicheiro, FileMode.Create);
+                  await imagemAnimal.CopyToAsync(stream);
+               }
                // devolver o controlo da app para a página de início
                return RedirectToAction(nameof(Index));
             }
