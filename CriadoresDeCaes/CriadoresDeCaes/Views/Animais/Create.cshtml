@@ -11,9 +11,9 @@
 <div class="row">
    <div class="col-md-4">
 
-       @* o parâmetro 'enctype' é fundamental para o formulário
-           enviar ficheiros
-       *@
+      @* o parâmetro 'enctype' é fundamental para o formulário
+      enviar ficheiros
+      *@
       <form asp-action="Create" method="post" enctype="multipart/form-data">
 
          @* espaço para mostrar as mensagens de erro gerais  *@
@@ -37,6 +37,15 @@
             <label asp-for="DataCompra" class="control-label"></label>
             <input asp-for="DataCompra" class="form-control" />
             <span asp-validation-for="DataCompra" class="text-danger"></span>
+         </div>
+
+         @* adição de um novo atributo para recolher o Preço de Compra
+         do animal
+         *@
+         <div class="form-group">
+            <label asp-for="PrecoCompraAux" class="control-label"></label>
+            <input asp-for="PrecoCompraAux" class="form-control" />
+            <span asp-validation-for="PrecoCompraAux" class="text-danger"></span>
          </div>
 
          <div class="form-group">
@@ -71,11 +80,10 @@
          @* recolher a imagem do animal *@
          <div class="form-group">
             <label class="control-label">Fotografia</label>
-            <input class="form-control" 
+            <input class="form-control"
                    type="file"
                    accept=".jpg,.jpeg,.png"
-                   name="imagemAnimal"
-            />
+                   name="imagemAnimal" />
          </div>
 
          <br />

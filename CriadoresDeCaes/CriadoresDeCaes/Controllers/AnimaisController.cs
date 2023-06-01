@@ -65,7 +65,7 @@ namespace CriadoresDeCaes.Controllers {
                                 .Include(a => a.Raca)
                                 .Include(a => a.ListaFotografias)
                                 .FirstOrDefaultAsync(m => m.Id == id);
-        
+
          if (animal == null) {
             return NotFound();
          }
@@ -102,7 +102,13 @@ namespace CriadoresDeCaes.Controllers {
       /// <returns></returns>
       [HttpPost]
       [ValidateAntiForgeryToken]
-      public async Task<IActionResult> Create([Bind("Id,Nome,DataNascimento,DataCompra,Sexo,NumLOP,RacaFK,CriadorFK")] Animais animal, IFormFile imagemAnimal) {
+      public async Task<IActionResult> Create([Bind("Nome,DataNascimento,DataCompra,PrecoCompra,PrecoCompraAux,Sexo,NumLOP,RacaFK,CriadorFK")] Animais animal, IFormFile imagemAnimal) {
+         /*
+          * a anotação Bind serve para autorizar o controller a ler
+          * o valor dos atributos que lhe chegam do browser.
+          * Se não estiverem identificados, não são lidos
+          */
+
          // vars. auxiliares
          string nomeFoto = "";
          bool existeFoto = false;
@@ -174,6 +180,13 @@ namespace CriadoresDeCaes.Controllers {
                } // if (imagemAnimal == null)
             } // if(animal.CriadoFK == 0)
          } // if (animal.RacaFK == 0)
+
+
+         // atribuir os dados do PrecoCompraAux ao PrecoCompra
+         // se não for nulo
+         if (!string.IsNullOrEmpty(animal.PrecoCompraAux)) {
+            animal.PrecoCompra = Convert.ToDecimal(animal.PrecoCompraAux.Replace('.', ','));
+         }
 
 
          // se os dados recebidos respeitarem o modelo,

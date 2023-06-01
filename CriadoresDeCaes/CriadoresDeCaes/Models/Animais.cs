@@ -33,6 +33,21 @@ namespace CriadoresDeCaes.Models {
       // se já se tiver transferido o Modelo para a BD
       // é preciso atualizar a BD com uma nova Migração
 
+      /// <summary>
+      /// Preço de compra do animal
+      /// </summary>
+      public decimal PrecoCompra { get; set; }
+
+      /// <summary>
+      /// Atributo de auxílio à adição do 
+      /// preço de compra de um animal
+      /// </summary>
+      [NotMapped] // esta anotação impede a EF de exportar este atributo para a BD
+      [RegularExpression("[0-9]+(.|,)?[0-9]{0,2}",
+         ErrorMessage = "Só pode escrever algarismos e, " +
+         "se desejar, duas casas decimais no {0}")]
+      [Display(Name ="Preço")]
+      public string PrecoCompraAux { get; set; }
 
       /// <summary>
       /// Sexo do cão
