@@ -9,7 +9,7 @@ namespace CriadoresDeCaes.Models {
    public class Animais {
 
       public Animais() {
-         ListaFotografias=new HashSet<Fotografias>();
+         ListaFotografias = new HashSet<Fotografias>();
       }
 
       public int Id { get; set; }
@@ -22,12 +22,17 @@ namespace CriadoresDeCaes.Models {
       /// <summary>
       /// data de nascimento
       /// </summary>
+      [Required(ErrorMessage = "A {0} é de preenchimento obrigatório")]
       public DateTime DataNascimento { get; set; }
 
       /// <summary>
       /// Data em que o cão foi comprado
       /// </summary>
-      public DateTime DataCompra { get; set; }
+      public DateTime? DataCompra { get; set; }
+      // o uso do ? transforma o atributo, tornando-o facultativo
+      // se já se tiver transferido o Modelo para a BD
+      // é preciso atualizar a BD com uma nova Migração
+
 
       /// <summary>
       /// Sexo do cão
@@ -52,7 +57,7 @@ namespace CriadoresDeCaes.Models {
       /// FK para a Raça do cão/cadela
       /// </summary>
       [ForeignKey(nameof(Raca))]
-      [Display(Name ="Raça")]
+      [Display(Name = "Raça")]
       public int RacaFK { get; set; }
       public Racas Raca { get; set; }
 
@@ -60,7 +65,7 @@ namespace CriadoresDeCaes.Models {
       /// FK para o Criador do cão/cadela
       /// </summary>
       [ForeignKey(nameof(Criador))]
-      [Display(Name ="Criador")]
+      [Display(Name = "Criador")]
       public int CriadorFK { get; set; }
       public Criadores Criador { get; set; }
 
