@@ -74,10 +74,19 @@ namespace CriadoresDeCaes.Models {
       //            ((+|00)[0-9]{2,5})?[0-9]{5,9}
       public string Telemovel { get; set; }
 
-      /// <summary>
-      /// FK para a lista de cães/cadelas, propriedade do Criador
-      /// </summary>
-      public ICollection<Animais> ListaAnimais { get; set; }
+
+        // ************************************************
+        /// <summary>
+        /// atributo para efetuar a ligação entre a base 
+        /// de dados do 'negócio' e a base de dados da autenticação
+        /// </summary>
+        public string UserId { get; set; }
+        // ************************************************
+
+        /// <summary>
+        /// FK para a lista de cães/cadelas, propriedade do Criador
+        /// </summary>
+        public ICollection<Animais> ListaAnimais { get; set; }
 
       /// <summary>
       /// M-N
