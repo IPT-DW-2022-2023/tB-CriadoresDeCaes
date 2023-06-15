@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CriadoresDeCaes.Data;
 using CriadoresDeCaes.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace CriadoresDeCaes.Controllers {
 
@@ -26,22 +27,38 @@ namespace CriadoresDeCaes.Controllers {
       /// </summary>
       private readonly IWebHostEnvironment _webHostEnvironment;
 
+      /// <summary>
+      /// dados sobre a pessoa que está a interagir com a aplicação
+      /// </summary>
+      private readonly UserManager<IdentityUser> _userManager;
+
       public AnimaisController(
          ApplicationDbContext context,
-         IWebHostEnvironment webHostEnvironment
+         IWebHostEnvironment webHostEnvironment,
+         UserManager<IdentityUser> userManager
          ) {
          _bd = context;
          _webHostEnvironment = webHostEnvironment;
+         _userManager = userManager;
       }
 
       // GET: Animais
       public async Task<IActionResult> Index() {
+         // var auxiliar
+         string idDaPessoaAutenticada = _userManager.GetUserId(User);
+
+
          /* procurar, na base de dados, a lista dos animal existentes
           * SELECT *
           * FROM Animais a INNER JOIN Criadores c ON a.CriadorFK = c.Id
           *                INNER JOIN Racas r ON a.RacaFK = r.Id
+          * WHERE c.UserId = Id da pessoa autenticada
           */
-         var listaAnimais = _bd.Animais.Include(a => a.Criador).Include(a => a.Raca);
+         var listaAnimais = _bd.Animais
+                               .Include(a => a.Criador)
+                               .Include(a => a.Raca)
+                               .Where(a => a.Criador.UserId == idDaPessoaAutenticada)
+                               ;
 
          // invoca a View, enviando uma lista de Animais
          return View(await listaAnimais.ToListAsync());
@@ -249,13 +266,22 @@ namespace CriadoresDeCaes.Controllers {
             return NotFound();
          }
 
-         var animais = await _bd.Animais.FindAsync(id);
-         if (animais == null) {
+         // var auxiliar
+         string idDaPessoaAutenticada = _userManager.GetUserId(User);
+
+         var animal = await _bd.Animais
+                               .Where(a => a.Id == id &&
+                                           a.Criador.UserId == idDaPessoaAutenticada)
+                               .FirstOrDefaultAsync();
+
+
+         if (animal == null) {
             return NotFound();
          }
-         ViewData["CriadorFK"] = new SelectList(_bd.Criadores, "Id", "Email", animais.CriadorFK);
-         ViewData["RacaFK"] = new SelectList(_bd.Racas, "Id", "Id", animais.RacaFK);
-         return View(animais);
+
+         ViewData["CriadorFK"] = new SelectList(_bd.Criadores, "Id", "Email", animal.CriadorFK);
+         ViewData["RacaFK"] = new SelectList(_bd.Racas, "Id", "Id", animal.RacaFK);
+         return View(animal);
       }
 
       // POST: Animais/Edit/5
